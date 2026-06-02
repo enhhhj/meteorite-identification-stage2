@@ -72,8 +72,8 @@ DINOv2 当前代码通过 `torch.hub.load("facebookresearch/dinov2", ...)` 加�
 模型权重未上传至 GitHub，请从以下云盘链接下载，并放入 `weights/` 文件夹：
 
 ```text
-百度网盘链接：TODO
-提取码：TODO
+通过网盘分享的文件：model
+链接: https://pan.baidu.com/c/1bBBGgVrLFduUqJPuaoEhLw?pwd=x1bs 提取码: x1bs
 
 weights/
 ├── convnext_tiny_best_model.pth

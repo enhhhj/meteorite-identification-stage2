@@ -1,0 +1,15 @@
+{
+  "conv_low": 0.4891,
+  "conv_high": 0.6124,
+  "swin_low": 0.5862,
+  "swin_high": 0.6973,
+  "dino_low": 0.246,
+  "dino_high": 0.8884,
+  "eff_low": 0.0905,
+  "eff_high": 0.44,
+  "w_conv": 0.2696,
+  "w_swin": 0.0981,
+  "w_dino": 0.2489,
+  "w_eff": 0.3834,
+  "vote_threshold": -0.175
+}

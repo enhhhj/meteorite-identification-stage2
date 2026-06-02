@@ -1,0 +1,20 @@
+{
+  "data_dir": "data",
+  "epochs": 30,
+  "batch_size": 128,
+  "lr": 0.003,
+  "weight_decay": 0.01,
+  "image_size": 224,
+  "model_name": "dinov2_vits14",
+  "patience": 8,
+  "min_delta": 0,
+  "seed": 42,
+  "num_workers": 4,
+  "output_root": "final/outputs",
+  "run_name": "dinov2_white_cat2_lr3e-3_wd1e-2",
+  "device": "auto",
+  "val_size": 0.2,
+  "concat_layers": 2,
+  "train_image_folder": "train_images_bg_removed",
+  "labels_csv": "train_labels.csv"
+}

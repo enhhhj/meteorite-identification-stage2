@@ -1,0 +1,21 @@
+{
+  "data_dir": "/data/final",
+  "epochs": 40,
+  "batch_size": 32,
+  "lr": 0.00003,
+  "weight_decay": 0.001,
+  "image_size": 224,
+  "model_name": "efficientnet_v2_s",
+  "pretrained": true,
+  "tta": "hflip",
+  "patience": 8,
+  "min_delta": 0,
+  "seed": 42,
+  "num_workers": 2,
+  "output_root": "/data/final/outputs",
+  "run_name": "efficientnetv2s_nogroup_teststyle_aug_seed42",
+  "device": "auto",
+  "val_size": 0.2,
+  "monitor": "val_f1",
+  "best_checkpoint": "/data/final/outputs/efficientnetv2s_nogroup_teststyle_aug_seed42/best_model.pth"
+}

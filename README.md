@@ -4,10 +4,10 @@
 
 本项目用于 Meteorite Identification Stage 2 二分类任务，目标是判断测试图片是否为陨石。最终复现方案使用四个模型的测试集概率进行加权投票集成：
 
-- ConvNeXt-Tiny
-- EfficientNetV2-S
-- DINOv2 ViT-S/14
-- Swin Transformer V2-S + EMA
+* ConvNeXt-Tiny
+* EfficientNetV2-S
+* DINOv2 ViT-S/14
+* Swin Transformer V2-S + EMA
 
 本仓库重点是复现最终测试结果，而不是重新训练出更高分。模型权重不会上传到 GitHub，需要单独下载后放入 `weights/`。
 
@@ -209,17 +209,29 @@ id,prob,label
 
 ## 最终集成
 
-每个模型根据 low/high 阈值转化为 -1、0、+1 三种投票。高于 high 表示正向高置信投票，低于 low 表示负向高置信投票，中间灰区为 0。EfficientNetV2-S 的输出方向在集成阶段经过校准，因此投票方向与其他模型相反。最后根据四个模型的加权投票分数得到最终 `label`。
+每个模型根据 low/high 阈值转化为 -1、0、+1 三种投票。高于 high 表示正向高置信投票，低于 low 表示负向高置信投票，中间灰区为 0。
+
+EfficientNetV2-S 的输出为陨石类别概率，因此在集成阶段与其他模型保持同方向投票。最终根据四个模型的加权投票分数得到基础 `label`，再对接近阈值的低置信样本使用灰区规则进行二次判别。
+
+核心逻辑如下：
 
 ```python
 conv_vote = 1 if conv >= conv_high else (-1 if conv <= conv_low else 0)
 swin_vote = 1 if swin >= swin_high else (-1 if swin <= swin_low else 0)
 dino_vote = 1 if dino >= dino_high else (-1 if dino <= dino_low else 0)
-eff_vote  = -1 if eff >= eff_high else (1 if eff <= eff_low else 0)
+eff_vote  = 1 if eff  >= eff_high  else (-1 if eff  <= eff_low  else 0)
 
-score = w_conv * conv_vote + w_swin * swin_vote + w_dino * dino_vote + w_eff * eff_vote
-label = 1 if score >= vote_threshold else 0
+score = (
+    w_conv * conv_vote
+    + w_swin * swin_vote
+    + w_dino * dino_vote
+    + w_eff * eff_vote
+)
+
+base_label = 1 if score >= vote_threshold else 0
 ```
+
+灰区样本通过 `configs/ensemble_config.json` 中的 `gray_margin` 和 `gray_rules` 控制。该部分用于处理多个模型分歧较大的边界样本。
 
 手动运行集成：
 
@@ -230,8 +242,23 @@ python ensemble_submit.py \
   --dino outputs/dinov2_probs.csv \
   --eff outputs/efficientnetv2s_probs.csv \
   --config configs/ensemble_config.json \
-  --out outputs/final_submission.csv
+  --out outputs/final_submission.csv \
+  --debug-out outputs/ensemble_debug.csv
 ```
+
+其中：
+
+```text
+outputs/final_submission.csv
+```
+
+是最终提交文件。
+
+```text
+outputs/ensemble_debug.csv
+```
+
+是可选调试文件，包含每个模型概率、投票值、加权分数、基础标签、最终标签以及触发的灰区规则。
 
 ## 一键复现
 
@@ -245,6 +272,19 @@ bash run_inference.sh
 
 ```bash
 WEIGHT_DIR=./weights DATA_DIR=/data/final TEST_DIR=/data/final/test_images bash run_inference.sh
+```
+
+如果需要单独重新生成最终提交文件，也可以直接运行：
+
+```bash
+python ensemble_submit.py \
+  --conv outputs/convnext_probs.csv \
+  --swin outputs/swin_probs.csv \
+  --dino outputs/dinov2_probs.csv \
+  --eff outputs/efficientnetv2s_probs.csv \
+  --config configs/ensemble_config.json \
+  --out outputs/final_submission.csv \
+  --debug-out outputs/ensemble_debug.csv
 ```
 
 ## 最终输出

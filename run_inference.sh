@@ -52,4 +52,5 @@ python ensemble_submit.py \
   --dino "${OUTPUT_DIR}/dinov2_probs.csv" \
   --eff "${OUTPUT_DIR}/efficientnetv2s_probs.csv" \
   --config configs/ensemble_config.json \
-  --out "${OUTPUT_DIR}/final_submission.csv"
+  --out "${OUTPUT_DIR}/final_submission.csv" \
+  --debug-out "${OUTPUT_DIR}/ensemble_debug.csv"
